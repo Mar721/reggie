@@ -13,3 +13,6 @@ js对long型数据进行处理时会丢失精度，导致提交的id和数据库
         //将上面的消息转换器对象追加到mvc框架的转换器集合中
         converters.add(0,messageConverter);
     }
+
+doFilter、update、updateFill都是同一个线程执行
+ThreadLocal为每个线程提供单独一份存储空间，具有线程隔离的效果，只有在线程内才能获取到对应的值，线程外则不能访问
