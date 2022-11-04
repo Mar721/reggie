@@ -1,6 +1,7 @@
 package com.example.reggie.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.example.reggie.common.CustomException;
 import com.example.reggie.common.R;
 import com.example.reggie.entity.User;
 import com.example.reggie.service.UserService;
@@ -8,6 +9,10 @@ import com.example.reggie.utils.ValidateCodeUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.mail.MailException;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,7 +26,18 @@ import java.util.Map;
 @Slf4j
 class UserController {
     @Autowired
+    private JavaMailSender mailSender;
+    @Autowired
     private UserService userService;
+    //获取邮件发送者
+    @Value("${spring.mail.username}")
+    private String from;
+    //获取邮件主题
+    @Value("${spring.mail.subject}")
+    private String subject;
+    //获取邮件内容
+    @Value("${spring.mail.context}")
+    private String context;
 
     /**
      * 发送手机短信验证码
@@ -39,13 +55,29 @@ class UserController {
             //调用阿里云提供的短信服务API完成发送短信，没有申请
             //SMSUtils.sendMessage("瑞吉外卖","",phone,code);
 
+            //发送邮件
+            SimpleMailMessage mailMessage = new SimpleMailMessage();
+            //设置发送方
+            mailMessage.setFrom(from);
+            //设置接收方
+            mailMessage.setTo(user.getPhone());
+            //设置主题
+            mailMessage.setSubject(subject);
+            //设置内容
+            mailMessage.setText(context + code);
+//            try {
+//                mailSender.send(mailMessage);
+//            }catch (MailException e){
+//                throw new CustomException("验证码发送失败");
+//            }
+
             //需要将生成的验证码保存到Session
             session.setAttribute(phone,code);
 
-            return R.success("手机验证码短信发送成功" + code);
+            return R.success("验证码发送成功" + code);
         }
 
-        return R.error("短信发送失败");
+        return R.error("验证码发送失败");
     }
 
     /**

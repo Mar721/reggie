@@ -10,6 +10,29 @@ spring:
       url: jdbc:mysql://localhost:3306/reggie?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&useSSL=false&allowPublicKeyRetrieval=true
       username: root
       password:
+  mail:
+    #smtp服务主机  qq邮箱则为smtp.qq.com
+    host: smtp.qq.com
+    #服务协议
+    protocol: smtp
+    # 编码集
+    default-encoding: UTF-8
+    #发送邮件的账户
+    username: 1489117944@qq.com
+    #授权码
+    password: bfyungkijugqjabc
+    #邮件主题
+    subject: 你的登录验证码
+    #邮件内容
+    context: 你的登录验证码为：
+    test-connection: true
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
 mybatis-plus:
   configuration:
     #在映射实体或者属性时，将数据库中表名和字段名中的下划线去掉，按照驼峰命名法映射
@@ -20,3 +43,4 @@ mybatis-plus:
       id-type: ASSIGN_ID
 reggie:
   path: E:\idea-workspace\reggie\src\main\resources\backend\images\img\
+
