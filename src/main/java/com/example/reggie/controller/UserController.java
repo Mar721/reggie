@@ -47,20 +47,20 @@ class UserController {
     @PostMapping("/sendMsg")
     public R<String> sendMsg(@RequestBody User user, HttpSession session){
         //获取手机号
-        String phone = user.getPhone();
+        String email = user.getEmail();
 
-        if(StringUtils.isNotEmpty(phone)){
+        if(StringUtils.isNotEmpty(email)){
             //生成随机的4位验证码
             String code = ValidateCodeUtils.generateValidateCode(4).toString();
             //调用阿里云提供的短信服务API完成发送短信，没有申请
-            //SMSUtils.sendMessage("瑞吉外卖","",phone,code);
+            //SMSUtils.sendMessage("瑞吉外卖","",email,code);
 
             //发送邮件
             SimpleMailMessage mailMessage = new SimpleMailMessage();
             //设置发送方
             mailMessage.setFrom(from);
             //设置接收方
-            mailMessage.setTo(user.getPhone());
+            mailMessage.setTo(user.getEmail());
             //设置主题
             mailMessage.setSubject(subject);
             //设置内容
@@ -72,7 +72,7 @@ class UserController {
 //            }
 
             //需要将生成的验证码保存到Session
-            session.setAttribute(phone,code);
+            session.setAttribute(email,code);
 
             return R.success("验证码发送成功" + code);
         }
@@ -88,22 +88,22 @@ class UserController {
      */
     @PostMapping("/login")
     public R<User> login(@RequestBody Map<String,Object> map, HttpSession session){
-        //获取手机号
-        String phone = map.get("phone").toString();
+        //获取邮箱
+        String email = map.get("email").toString();
         //获取验证码
         String code = map.get("code").toString();
         //从Session中获取保存的验证码
-        Object codeInSession = session.getAttribute(phone);
+        Object codeInSession = session.getAttribute(email);
         //进行验证码的比对（页面提交的验证码和Session中保存的验证码比对）
         if(codeInSession != null && codeInSession.equals(code)){
             //如果能够比对成功，说明登录成功
             LambdaQueryWrapper<User> queryWrapper = new LambdaQueryWrapper<>();
-            queryWrapper.eq(User::getPhone,phone);
+            queryWrapper.eq(User::getEmail,email);
             User user = userService.getOne(queryWrapper);
             if(user == null){
                 //判断当前手机号对应的用户是否为新用户，如果是新用户就自动完成注册
                 user = new User();
-                user.setPhone(phone);
+                user.setEmail(email);
                 user.setStatus(1);
                 userService.save(user);
             }
